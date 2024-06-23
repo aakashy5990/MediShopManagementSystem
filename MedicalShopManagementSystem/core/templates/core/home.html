@@ -1,0 +1,609 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block tittle %} Welcome | MedicalShopManagementSystem {% endblock tittle %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+{% endblock style %}
+
+
+
+
+{% comment %} ************* dealer start************* {% endcomment %}
+{% block dealer %}
+<div class="card-container" id="add-dealer-card">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Add Dealer Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Dealer Name:</label>
+                        <input type="text" class="form-control" name="dealer_name" placeholder="Enter Dealer Name..." required>
+                    </div>
+                    <div class="form-group my-3">
+                        <label for="email">Email address:</label>
+                        <input type="email" class="form-control" name="dealer_email" placeholder="name@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="number">Phone Contact:</label>
+                        <input type="number" class="form-control" name="dealer_number" required>
+                    </div>
+                    <div class="form-group my-3">
+                        <label for="address">Address:</label>
+                        <input type="text" class="form-control" name="dealer_address" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                </form>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-container" id="view-dealer-card" style="display: none;">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Dealer Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container">
+            <table class="table table-hover">
+                <thead>
+                    {% if dealers %}
+                  <tr class="text-center">
+                    <th scope="col">Dealer ID</th>
+                    <th scope="col">Dealer Name</th>
+                    <th scope="col">Dealer Address</th>
+                    <th scope="col">Dealer Email</th>
+                    <th scope="col">Dealer Number</th>
+                    <th scope="col">Action</th>
+                    <th> 
+                        
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for pi in dealers %}
+                  <tr class="text-center">
+                    <td><a class="color-dark" href="{% url 'dealer_update' pi.id %}" data-target="#add-dealer-card"  >{{pi.id}}</a></li>
+                    <td>{{pi.dealer_name}}</td>
+                    <td>{{pi.dealer_address}}</td>
+                    <td>{{pi.dealer_email}}</td>
+                    <td>{{pi.dealer_number}}</td>
+                    <td class="d-flex td_button">
+                        <form action="{% url 'dealer_delete' pi.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete" class="btn btn-danger dealer_delete_btn">
+                        </form>    
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  {% else %}
+                  <h2 class="alert alert-danger my-3">Database are empty</h2>
+                  {% endif %}
+                  
+                </tbody>
+            </table>
+            <p class="text-center"> Click on a Dealer Id to update record... </p>
+        </div>
+    </div>
+</div>
+{% endblock dealer %}
+{% comment %} ************* dealer end************* {% endcomment %}
+
+
+
+ 
+{% comment %} ************* medicine start************* {% endcomment %}
+{% block medicine %}
+<div class="card-container" id="add-medicine-card">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Add Medicine Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="medicine_code">Medicine Code:</label>
+                        <input type="number" class="form-control" placeholder="Enter a unique Code..." name="medicine_code" required>
+                    </div>
+                    <div class="form-group ">
+                        <label for="medicine_name">Medicine Name:</label>
+                        <input type="text" class="form-control" name="medicine_name" required>
+                    </div>
+                    <div class="form-group ">
+                        <label for="purchase_customer_name">Dealer Name:</label>
+                        <select class="form-control" name="medicine_dealer_name" required>
+                            <option value="">Select</option>
+                            {% for dealer in dealers %}
+                                <option value="{{ dealer.id }}" {% if default_dealer and dealer.id == default_dealer.id %}selected{% endif %}>
+                                    {{ dealer.dealer_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="medicine_price">Price:</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₹</span>
+                            </div>
+                            <input type="text" class="form-control" id="medicine_price" name="medicine_price" placeholder="Enter price" value="{{ request.POST.medicine_price|default_if_none:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="medicine_stock">Stock:</label>
+                        <input type="number" class="form-control" name="medicine_stock" required>
+                    </div>
+                    <div class="form-group ">
+                        <label for="medicine_desc">Description:</label>
+                        <input type="text" class="form-control" name="medicine_desc" required>
+                    </div>
+                    
+                    <div class="col-12 my-3">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                    </div>
+                </form>
+                
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-container" id="view-medicine-card" style="display: none;">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Medicine Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container">
+            <table class="table table-hover">
+                <thead>
+                    {% if medicine %}
+                  <tr class="text-center">
+                    <th scope="col">ID</th>
+                    <th scope="col">Medicine Code</th>
+                    <th scope="col">Medicine Name</th>
+                    <th scope="col">Dealer ID</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Discription</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for pi in medicine %}
+                  <tr class="text-center">
+                    <td><a class="color-dark" href="{% url 'medicine_update' pi.id %}" data-target="#add-dealer-card">{{pi.id}}</a></li>
+                    <td>{{pi.medicine_code}}</td>
+                    <td>{{pi.medicine_name}}</td>
+                    <td>{{pi.medicine_dealer_name_id}}</td>
+                    <td>{{pi.medicine_price}}</td>
+                    <td>{{pi.medicine_stock}}</td>
+                    <td>{{pi.medicine_desc}}</td>
+                    <td class="d-flex td_button">
+                        <form action="{% url 'medicine_delete' pi.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete" class="btn btn-danger dealer_delete_btn">
+                        </form>    
+                    </td>
+                  </tr>
+                {% endfor %}
+                {% else %}
+                <h2 class="alert alert-danger my-3">Database are empty</h2>
+                {% endif %}
+                
+            </tbody>
+        </table>
+        <p class="text-center"> Click on a Medicine Id to update record...</p>
+        </div>
+    </div>
+</div>
+{% endblock medicine %}
+{% comment %} ************* medicine end************* {% endcomment %}
+
+
+
+
+{% comment %} ************* employee start************* {% endcomment %}
+{% block employee %}
+<div class="card-container" id="add-employee-card">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Add employee Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form class="row" id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="employee_id">Employee ID:</label>
+                        <input type="number" class="form-control" name="employee_id" placeholder="Enter a unique Id..." required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="employee_first_name" class="form-label">First Name:</label>
+                        <input type="text" class="form-control" name="employee_first_name">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="employee_last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" name="employee_last_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_address">Address:</label>
+                        <input type="text" class="form-control" name="employee_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_salary">Salary:</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₹</span>
+                            </div>
+                            <input type="text" class="form-control" id="employee_salary" name="employee_salary" placeholder="Enter salary" value="{{ request.POST.employee_salary|default_if_none:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_contact">Phone Number:</label>
+                        <input type="number" class="form-control" name="employee_contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_email">Email:</label>
+                        <input type="email" class="form-control" name="employee_email" required>
+                    </div>
+
+                    <div class="col-12 my-3">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                    </div>
+                </form>
+                
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-container" id="view-employee-card" style="display: none;">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Employee Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container">
+            <table class="table table-hover">
+                <thead>
+                    {% if employee %}
+                  <tr class="text-center">
+                    <th scope="col">ID</th>
+                    <th scope="col">Employee ID</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Salary</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">Email</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for pi in employee %}
+                  <tr class="text-center" >
+                    <td><a class="color-dark" href="{% url 'employee_update' pi.id %}" data-target="#add-dealer-card">{{pi.id}}</a></li>
+                    <td>{{pi.employee_id}}</td>
+                    <td>{{pi.employee_first_name}}</td>
+                    <td>{{pi.employee_last_name}}</td>
+                    <td>{{pi.employee_address}}</td>
+                    <td>{{pi.employee_salary}}</td>
+                    <td>{{pi.employee_contact}}</td>
+                    <td>{{pi.employee_email}}</td>
+                    <td class="d-flex td_button">
+                        <form action="{% url 'employee_delete' pi.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete" class="btn btn-danger dealer_delete_btn">
+                        </form>    
+                    </td>
+                  </tr>
+                {% endfor %}
+                {% else %}
+                <h2 class="alert alert-danger my-3">Database are empty</h2>
+                {% endif %}
+                
+            </tbody>
+        </table>
+        <p class="text-center my-3"> Click on a Employee Id to update record...</p>
+        </div>
+    </div>
+</div>
+{% endblock employee %}
+{% comment %} ************* employee end************* {% endcomment %}
+
+
+
+{% comment %} ************* customer start************* {% endcomment %}
+{% block customer %}
+<div class="card-container" id="add-customer-card">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Add Customer Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form class="row" id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="col-md-6 form-group">
+                        <label for="customer_first_name" class="form-label">First Name:</label>
+                        <input type="text" class="form-control" name="customer_first_name">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="customer_last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" name="customer_last_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_address">Address:</label>
+                        <input type="text" class="form-control" name="customer_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_contact">Phone Number:</label>
+                        <input type="number" class="form-control" name="customer_contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_email">Email:</label>
+                        <input type="email" class="form-control" name="customer_email" required>
+                    </div>
+
+                    <div class="col-12 my-3">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                    </div>
+                </form>
+                
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-container" id="view-customer-card" style="display: none;">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Customer Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container">
+            <table class="table table-hover">
+                <thead>
+                    {% if customer %}
+                  <tr class="text-center">
+                    <th scope="col">ID</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">Email</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for pi in customer %}
+                  <tr class="text-center" >
+                    <td><a class="color-dark" href="{% url 'customer_update' pi.id %}" data-target="#add-dealer-card">{{pi.id}}</a></li>
+                    <td>{{pi.customer_first_name}}</td>
+                    <td>{{pi.customer_last_name}}</td>
+                    <td>{{pi.customer_address}}</td>
+                    <td>{{pi.customer_contact}}</td>
+                    <td>{{pi.customer_email}}</td>
+                    <td class="d-flex td_button">
+                        <form action="{% url 'customer_delete' pi.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete" class="btn btn-danger dealer_delete_btn">
+                        </form>    
+                    </td>
+                  </tr>
+                {% endfor %}
+                {% else %}
+                <h2 class="alert alert-danger my-3">Database are empty</h2>
+                {% endif %}
+                
+            </tbody>
+        </table>
+        <p class="text-center my-3"> Click on a Customer Id to update record...</p>
+        </div>
+    </div>
+</div>
+{% endblock customer %}
+{% comment %} ************* customer end************* {% endcomment %}
+
+
+
+
+{% comment %} ************* purchase start************* {% endcomment %}
+{% block purchase %}
+<div class="card-container" id="add-purchase-card">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Add Purchase Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form class="row" id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="product_name">Product Name:</label>
+                        <input type="text" class="form-control" name="product_name" required>
+                    </div>
+                    <div class="form-group ">
+                        <label for="purchase_customer_name">Customer Name:</label>
+                        <select class="form-control" name="purchase_customer_name" required>
+                            <option value="">Select</option>
+                            {% for customer in customer %}
+                                <option value="{{ customer.id }}" {% if customers_first and customer.id == customers_first.id %}selected{% endif %}>
+                                    {{ customer.customer_first_name }} {{ customer.customer_last_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchase_contact">Contact:</label>
+                        <input type="number" class="form-control" name="purchase_contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchase_price">Price:</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₹</span>
+                            </div>
+                            <input type="text" class="form-control" id="purchase_price" name="purchase_price" value="{{ request.POST.purchase_price|default_if_none:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchase_quantity">Quantity:</label>
+                        <input type="number" class="form-control" name="purchase_quantity" required>
+                    </div>
+
+                    <div class="col-12 my-3">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                    </div>
+                </form>
+                
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-container" id="view-purchase-card" style="display: none;">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Purchase Details...</p>
+            <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="container">
+            <table class="table table-hover">
+                <thead>
+                    {% if customer %}
+                  <tr class="text-center">
+                    <th scope="col">ID</th>
+                    <th scope="col">Product Name</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for pi in purchase %}
+                  <tr class="text-center" >
+                    <td><a class="color-dark" href="{% url 'purchase_update' pi.id %}" data-target="#add-dealer-card">{{pi.id}}</a></li>
+                    <td>{{pi.product_name}}</td>
+                    <td>{{pi.purchase_customer_name}}</td>
+                    <td>{{pi.purchase_contact}}</td>
+                    <td>{{pi.purchase_price}}</td>
+                    <td>{{pi.purchase_quantity}}</td>
+                    <td class="d-flex td_button">
+                        <form action="{% url 'purchase_delete' pi.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete" class="btn btn-danger dealer_delete_btn">
+                        </form>    
+                    </td>
+                  </tr>
+                {% endfor %}
+                {% else %}
+                <h2 class="alert alert-danger my-3">Database are empty</h2>
+                {% endif %}
+                
+            </tbody>
+        </table>
+        <p class="text-center my-3"> Click on a Medicine Id to update record...</p>
+        </div>
+    </div>
+</div>
+{% endblock purchase %}
+{% comment %} ************* purchase end************* {% endcomment %}
+
+
+
+
+
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            // Show specific card when clicking the toggle button
+            $('.toggle-card-btn').click(function() {
+                var target = $(this).data('target');
+                $('.card-container').hide();  // Hide all cards first
+                $(target).fadeIn();
+            });
+
+            // Close card when clicking the close button
+            $('.close-card-btn').click(function() {
+                $(this).closest('.card-container').fadeOut();
+            });
+        });
+
+    </script>
+{% endblock script %}

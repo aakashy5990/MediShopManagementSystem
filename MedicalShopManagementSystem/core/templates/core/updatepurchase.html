@@ -1,0 +1,86 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'core/css/updatedealer.css' %}">
+{% endblock style %}
+{% block onload %} 
+onload="$('#exampleModalCenter').modal('show')"
+{% endblock onload %}
+
+
+{% block purchase %}
+
+<div class="card-container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Purchase Update Details...</p>
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form class="row" id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="product_name">Product Name:</label>
+                        <input type="text" class="form-control" name="product_name" value="{{queryset.product_name}}" required>
+                    </div>
+                    <div class="form-group ">
+                        <label for="purchase_customer_name">Customer Name:</label>
+                        <select class="form-control" name="purchase_customer_name" required>
+                            <option value="">Select</option>
+                            {% for customer in customer %}
+                                <option value="{{ customer.id }}" {% if customers_first and customer.id == customers_first.id %}selected{% endif %}>
+                                    {{ customer.customer_first_name }} {{ customer.customer_last_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchase_contact">Contact:</label>
+                        <input type="number" class="form-control" value="{{queryset.purchase_contact}}" name="purchase_contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchase_price">Price:</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₹</span>
+                            </div>
+                            <input type="text" class="form-control" value="{{queryset.purchase_price}}" id="purchase_price" name="purchase_price" value="{{ request.POST.purchase_price|default_if_none:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchase_quantity">Quantity:</label>
+                        <input type="number" class="form-control" value="{{queryset.purchase_quantity}}" name="purchase_quantity" required>
+                    </div>
+
+                    <div class="col-12 my-3">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock purchase %}
+
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            // Show specific card when clicking the toggle button
+            $('.toggle-card-btn').click(function() {
+                var target = $(this).data('target');
+                $('.card-container').hide();  // Hide all cards first
+                $(target).fadeIn();
+            });
+
+            // Close card when clicking the close button
+            $('.close-card-btn').click(function() {
+                $(this).closest('.card-container').fadeOut();
+            });
+        });
+
+    </script>
+    {% endblock script %}

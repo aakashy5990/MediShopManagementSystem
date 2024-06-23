@@ -1,0 +1,86 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'core/css/updatedealer.css' %}">
+{% endblock style %}
+{% block onload %} 
+onload="$('#exampleModalCenter').modal('show')"
+{% endblock onload %}
+
+
+{% block medicine %}
+
+<div class="card-container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Medicine Update Details...</p>
+            {% comment %} <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button> {% endcomment %}
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="medicine_code">Medicine Code:</label>
+                        <input type="number" class="form-control" name="medicine_code" value={{queryset.medicine_code}} required>
+                    </div>
+                    <div class="form-group my-3">
+                        <label for="medicine_name">Medicine Name:</label>
+                        <input type="text" class="form-control" name="medicine_name" value={{queryset.medicine_name}} required>
+                    </div>
+                    <div class="form-group my-3">
+                        <label for="medicine_dealer_name">Dealer Name:</label>
+                        <select class="form-control" name="medicine_dealer_name" required>
+                            <option value="">Select</option>
+                            {% for dealer in dealers %}
+                                <option value="{{ dealer.id }}" {% if dealer.id == queryset.medicine_dealer_name_id %}selected{% endif %}>
+                                    {{ dealer.dealer_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="medicine_price">Price:</label>
+                        <input type="number" class="form-control" name="medicine_price" value={{queryset.medicine_price}} required>
+                    </div>
+                    <div class="form-group">
+                        <label for="medicine_stock">Stock:</label>
+                        <input type="number" class="form-control" name="medicine_stock" value={{queryset.medicine_stock}} required>
+                    </div>
+                    <div class="form-group my-3">
+                        <label for="medicine_desc">Description:</label>
+                        <input type="text" class="form-control" name="medicine_desc" value={{queryset.medicine_desc}} required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock medicine %}
+
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            // Show specific card when clicking the toggle button
+            $('.toggle-card-btn').click(function() {
+                var target = $(this).data('target');
+                $('.card-container').hide();  // Hide all cards first
+                $(target).fadeIn();
+            });
+
+            // Close card when clicking the close button
+            $('.close-card-btn').click(function() {
+                $(this).closest('.card-container').fadeOut();
+            });
+        });
+
+    </script>
+    {% endblock script %}

@@ -1,0 +1,98 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'core/css/updatedealer.css' %}">
+{% endblock style %}
+{% block onload %} 
+onload="$('#exampleModalCenter').modal('show')"
+{% endblock onload %}
+
+
+{% block dealer %}
+{% comment %} <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div> {% endcomment %}
+
+
+<div class="card-container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Update Details...</p>
+            {% comment %} <button type="button" class="close btn btn-danger close-card-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button> {% endcomment %}
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Dealer Name:</label>
+                        <input type="text" class="form-control" name="dealer_name" value="{{queryset.dealer_name}}" required>
+                    </div>
+                    <div class="form-group my-3">
+                        <label for="email">Email address:</label>
+                        <input type="email" class="form-control" name="dealer_email" value="{{queryset.dealer_email}}" placeholder="name@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="number">Phone Number:</label>
+                        <input type="number" class="form-control" value="{{queryset.dealer_number}}" name="dealer_number" required>
+                    </div>
+                    <div class="form-group my-3">
+                        <label for="address">Address:</label>
+                        <input type="text" class="form-control" value="{{queryset.dealer_address}}" name="dealer_address" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                </form>
+                {% comment %} {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %} {% endcomment %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock dealer %}
+
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            // Show specific card when clicking the toggle button
+            $('.toggle-card-btn').click(function() {
+                var target = $(this).data('target');
+                $('.card-container').hide();  // Hide all cards first
+                $(target).fadeIn();
+            });
+
+            // Close card when clicking the close button
+            $('.close-card-btn').click(function() {
+                $(this).closest('.card-container').fadeOut();
+            });
+        });
+
+    </script>
+    {% endblock script %}

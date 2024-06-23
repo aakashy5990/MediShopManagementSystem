@@ -1,0 +1,87 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'core/css/updatedealer.css' %}">
+{% endblock style %}
+{% block onload %} 
+onload="$('#exampleModalCenter').modal('show')"
+{% endblock onload %}
+
+
+{% block medicine %}
+
+<div class="card-container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p class="d-flex align-items-center">Employee Update Details...</p>
+        </div>
+        <div class="container main_container">
+            <div class="card-body">
+                <form class="row" id="card-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="employee_id">Employee ID:</label>
+                        <input type="number" class="form-control" name="employee_id" value="{{queryset.employee_id}}" placeholder="Enter a unique Id..." required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="employee_first_name" class="form-label">First Name:</label>
+                        <input type="text" class="form-control" value="{{queryset.employee_first_name}}" name="employee_first_name">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="employee_last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" value="{{queryset.employee_last_name}}" name="employee_last_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_address">Address:</label>
+                        <input type="text" class="form-control" value="{{queryset.employee_address}}" name="employee_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_salary">Salary:</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₹</span>
+                            </div>
+                            <input type="text" class="form-control" id="employee_salary" value="{{queryset.employee_salary}}" name="employee_salary" placeholder="Enter salary" value="{{ request.POST.employee_salary|default_if_none:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_contact">Phone Number:</label>
+                        <input type="number" class="form-control" name="employee_contact" value="{{queryset.employee_contact}}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_email">Email:</label>
+                        <input type="email" class="form-control" name="employee_email" value="{{queryset.employee_email}}" required>
+                    </div>
+
+                    <div class="col-12 my-3">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock medicine %}
+
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            // Show specific card when clicking the toggle button
+            $('.toggle-card-btn').click(function() {
+                var target = $(this).data('target');
+                $('.card-container').hide();  // Hide all cards first
+                $(target).fadeIn();
+            });
+
+            // Close card when clicking the close button
+            $('.close-card-btn').click(function() {
+                $(this).closest('.card-container').fadeOut();
+            });
+        });
+
+    </script>
+    {% endblock script %}

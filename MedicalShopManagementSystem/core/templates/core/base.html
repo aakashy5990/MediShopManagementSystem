@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block tittle %}  {% endblock tittle %}</title>
+    <link rel="stylesheet" href="{% static 'core/css/bootstrap.css' %}">
+    {% block style %}
+    
+    {% endblock style %}
+    <style>
+        a{
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body {% block onload %}  {% endblock onload %} >
+
+    {% include "core/nav.html" %}
+    <div class="container-fluid bg_container">
+        <div class="row bg_row">
+            <img src="{% static 'core/img/bg1.jpeg' %}">
+          <div class="col-12 bg-image">
+            <h1 class="text-center text-white">Welcome to MedicalShopManagementSystem</h1>
+          </div>
+        </div>
+      </div>
+
+    <div class="container">
+        {% block dealer %}
+        
+        {% endblock dealer %}
+
+        {% block medicine %}
+        
+        {% endblock medicine %}
+
+        {% block employee %}
+        
+        {% endblock employee %}
+
+        {% block customer %}
+        
+        {% endblock customer %}
+
+        {% block purchase %}
+        
+        {% endblock purchase %}
+
+    </div>
+
+    <script src="{% static 'core/js/popper.js' %}"></script>
+    <script src="{% static 'core/js/jquery.js' %}"></script>
+    <script src="{% static 'core/js/bootstrap.js' %}"></script>
+
+
+    {% block script %}
+
+
+    {% endblock script %}
+
+</body>
+</html>
