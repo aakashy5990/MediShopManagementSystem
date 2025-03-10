@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['medishopmanagementsystem-production.up.railway.app']
 
+CSRF_TRUSTED_ORIGINS = [ 'https://web-production-bd820.up.railway.app' ]
+
 
 # Application definition
 
