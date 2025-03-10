@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-@z&i^bcci_4edgapd2c^dmvus%@-pq%-3dq9y4a=bh(8*$x1ag
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://medishopmanagementsystem-production.up.railway.app']
+ALLOWED_HOSTS = ['medishopmanagementsystem-production.up.railway.app']
 
 
 # Application definition
